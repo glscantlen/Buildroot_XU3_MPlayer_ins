@@ -14,12 +14,30 @@ a previously installed system.
 
 *******************************************************************
 
- NOTICE: FUTURE DEVELOPMENT OF THIS INSTRUCTION WILL BE LIMITED.
-         DUE TO THE LIMITATIONS OF SUBMODULES IT WAS DECIDED
-         TO MOVE THESE INSTRUCTIONS TO A DEDICATED REPOSITORY.
-         THE NEW INSTRUCTION REPOSITORY FOR XU3_MPLAYER WILL BE
-         LOCATED AT:
-         https://github.com/glscantlen/Buildroot_XU3_MPlayer_ins
+ # This instruction was split from the original in:
+   https://github.com/glscantlen/instructions/Buildroot_XU3_MPlayer
+
+ - Created a new, empty (no README) repository in github:
+   https://github.com/glscantlen/Buildroot_XU3_MPlayer_ins
+   Use "git subtree split" to extract the Buildroot_XU3_MPlayer folder
+   into a separate branch that will be pushed onto the new repository.
+
+    $ cd ~/instructions
+    $ git subtree split --prefix=Buildroot_XU3_MPlayer --annotate="(split)" -b split
+    $ git push https://github.com/glscantlen/Buildroot_XU3_MPlayer_ins.git split:master
+    $ cd ~
+    $ git clone https://github.com/glscantlen/Buildroot_XU3_MPlayer_ins.git
+    $ cd ~/Buildroot_XU3_MPlayer_ins
+    $ git branch BR-2015.05
+    - Stay in the "master" branch
+    - Edit this Readme and commit.
+    - push the master and BR-2015.05 branchs onto the new repository.
+    $ git push --all -u
+
+ # The intent is to create a new repository specifically for
+   Buildroot_XU3_MPlayer, with tags and branches to support
+   different versions of Buildroot. The first branch, BR-2015.05
+   is maintained for merging in with the instructions repository.
 
 *******************************************************************
 
