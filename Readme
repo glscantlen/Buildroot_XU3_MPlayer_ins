@@ -14,20 +14,21 @@ a previously installed system.
 
 *******************************************************************
 
- # This instruction was split from the original in:
+ # The following notes how Buildroot_XU3_MPlayer_ins repository
+   was split from it's original directory:
    https://github.com/glscantlen/instructions/Buildroot_XU3_MPlayer
 
- - Created a new, empty (no README) repository in github:
-   https://github.com/glscantlen/Buildroot_XU3_MPlayer_ins
-   Use "git subtree split" to extract the Buildroot_XU3_MPlayer folder
-   into a separate branch that will be pushed onto the new repository.
+ - Create a new, empty (no README) repository online with github:
+   https://github.com/glscantlen/Buildroot_XU3_MPlayer_ins. Then
+   use "git subtree split" to extract the Buildroot_XU3_MPlayer
+   folder into a branch that will be pushed onto the new repository.
 
-    $ cd ~/instructions
+    $ cd instructions
     $ git subtree split --prefix=Buildroot_XU3_MPlayer --annotate="(split)" -b split
     $ git push https://github.com/glscantlen/Buildroot_XU3_MPlayer_ins.git split:master
-    $ cd ~
+    $ cd ..
     $ git clone https://github.com/glscantlen/Buildroot_XU3_MPlayer_ins.git
-    $ cd ~/Buildroot_XU3_MPlayer_ins
+    $ cd Buildroot_XU3_MPlayer_ins
     $ git branch BR-2015.05
     - Stay in the "master" branch
     - Edit this Readme and commit.
@@ -38,6 +39,30 @@ a previously installed system.
    Buildroot_XU3_MPlayer, with tags and branches to support
    different versions of Buildroot. The first branch, BR-2015.05
    is maintained for merging in with the instructions repository.
+
+ - prepare and test "instructions" for pulling and pushing the subtree,
+   Buildroot_XU3_MPlayer_ins.
+
+    $ cd ../instructions
+    $ git rm -r Buildroot_XU3_MPlayer
+    $ git commit -am "Replace Buildroot_XU3_MPlayer with subtree from Buildroot_XU3_MPlayer_ins"
+    $ git show-ref --verify refs/heads/split
+    $ git branch -D split
+    $ git subtree add   --prefix=Buildroot_XU3_MPlayer  ../Buildroot_XU3_MPlayer_ins  af2ea837d085b8d4f16db0c2b0f5c9c06367b119
+    $ git subtree pull  --prefix=Buildroot_XU3_MPlayer  https://github.com/glscantlen/Buildroot_XU3_MPlayer_ins.git  BR-2015.05
+
+ # update the github repository
+    $ git push
+
+
+ ! Note: should've used "--rejoin" in split and 'git subtree push'
+    $ git subtree split --prefix=Buildroot_XU3_MPlayer  --annotate="(split)"  --rejoin
+    $ git subtree push  --prefix=Buildroot_XU3_MPlayer  https://github.com/glscantlen/Buildroot_XU3_MPlayer_ins.git  master
+    - Clone, branch, edit, commit, and push Buildroot_XU3_MPlayer_ins
+    $ git subtree pull  --prefix=Buildroot_XU3_MPlayer  https://github.com/glscantlen/Buildroot_XU3_MPlayer_ins.git  BR-2015.05
+
+ # Example for pushing commits out of the original "instructions":
+    $ git subtree push  --prefix=Buildroot_XU3_MPlayer  some/other/repo  BR-2015.05
 
 *******************************************************************
 
