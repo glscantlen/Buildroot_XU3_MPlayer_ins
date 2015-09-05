@@ -5,7 +5,7 @@ for the bootloader and BuildRoot for building the root filesystem.
 The instructions will build the kernel and u-boot from the Hardkernel
 repositories, external to BuildRoot.
 
-These procedures were written to be executed on an Ubuntu 14.04 x86
+These procedures were written to be executed on an Ubuntu 15.04 x86
 desktop. The target system will be placed onto a microSD that will
 boot the Odroid-XU3. Alternatively, the system can be transfered to
 the Odroid-XU3 remotely. There is no requirement to preform software
