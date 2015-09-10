@@ -168,7 +168,8 @@ requires extra cabling and utilities, see appended instructions:
 
     - Create boot and root partitions
        ! CAUTION Make sure DEV_SD is the correct device for the microSD.
-       $ sudo parted $DEV_SD "mkpart primary fat32 1572864B 136314879B" # (I)gnore performance warning
+       $ sudo parted $DEV_SD "mkpart primary fat32 1572864B 136314879B"
+         (I)gnore performance warning
        $ sudo parted $DEV_SD "mkpart primary ext4 136314880B -1"
        $ sudo parted $DEV_SD unit B print
          Set these variables to hold reported sizes. We will need them later.
@@ -269,9 +270,9 @@ requires extra cabling and utilities, see appended instructions:
    ###cd ~/xu3_mplayer
    ### . set_tc_env.sh
 
-    $ wget http://git.buildroot.net/buildroot/snapshot/buildroot-2015.05.tar.bz2
-    $ tar -xvjf buildroot-2015.05.tar.bz2
-    $ cd buildroot-2015.05
+    $ wget http://git.buildroot.net/buildroot/snapshot/buildroot-2015.08.tar.bz2
+    $ tar -xvjf buildroot-2015.08.tar.bz2
+    $ cd buildroot-2015.08
 
     - Add a new video driver package "armsoc" to Buildroot
       This is an X11 driver supporting the OdroidXU3's video hardware.
@@ -335,14 +336,14 @@ requires extra cabling and utilities, see appended instructions:
        $ chmod +x support/scripts/config_eth
 
 
-    - Add "Skeleton" files and folders to be merged into the root filesystem.
-
-       # Add a desirable #of ctrl-alt-F# terminals before the getty serial port
-       $ nano -w system/skeleton/etc/inittab
+    - Add a desirable #of ctrl-alt-F# terminals before the getty serial port.
+       $ nano -w package/busybox/inittab
          ...
          tty1::respawn:/sbin/getty 38400 tty1
          tty2::respawn:/sbin/getty 38400 tty2
          ...
+
+    - Add "Skeleton" files and folders to be merged into the root filesystem.
 
        # Xorg is configured to use the new armsoc driver with fbdev /dev/fb0
        $ mkdir system/skeleton/etc/X11
@@ -487,7 +488,7 @@ ___________________________________________________
 Thanks to Legath on the Odroid forum for help with this .mk. Also thanks to
 mihailescu2m and mdrjr for providing the armsoc driver sources. Other libraries
 for EGL/GLES still need config/built/installed/tested. see "TODO list"
-###cd ~/xu3_mplayer/buildroot-2015.05
+###cd ~/xu3_mplayer/buildroot-2015.08
 
  ! NOTICE: several versions of this driver code are currently being developed.
    included in this '.mk' are a couple that can be de/selected using the comment (#).
@@ -544,7 +545,7 @@ ________________________
 
 Edit Xorg configuration
 ________________________
-###cd ~/xu3_mplayer/buildroot-2015.05
+###cd ~/xu3_mplayer/buildroot-2015.08
  $ nano -w system/skeleton/etc/X11/xorg.conf
 
 Section     "Device"
@@ -585,7 +586,7 @@ _________________________________
 
 BuildRoot Menuconfig from scratch
 _________________________________
-###cd ~/xu3_mplayer/buildroot-2015.05
+###cd ~/xu3_mplayer/buildroot-2015.08
 ### . set_tc_env.sh
 
  $ sudo apt-get install ncurses-dev
@@ -796,7 +797,7 @@ See above "Build & Install BuildRoot" and "Build & Install the kernel"
 
  - Hardkernel boot image
     $ cd ~/xu3_mplayer/linux
-    $ rm /tmp/VFS_BOOT.img
+    $ rm /tmp/VFS_BOOT.img  # just in case
     $ dd if=/dev/zero of=/tmp/VFS_BOOT.img bs=1 count=0 seek=$SIZEOF_DEV_SD1 ; ls -alsh /tmp/VFS_BOOT.img
     $ mkfs.vfat /tmp/VFS_BOOT.img ; ls -alsh /tmp/VFS_BOOT.img
     $ fsck.vfat -fVv /tmp/VFS_BOOT.img # verify fat
@@ -808,8 +809,8 @@ See above "Build & Install BuildRoot" and "Build & Install the kernel"
     $ sudo fastboot flash fat /tmp/VFS_BOOT.img
 
  - Buildroot root image
-    $ cd ~/xu3_mplayer/buildroot-2015.05
-    $ rm /tmp/VFS_ROOT.img
+    $ cd ~/xu3_mplayer/buildroot-2015.08
+    $ rm /tmp/VFS_ROOT.img  # just in case
     $ dd if=/dev/zero of=/tmp/VFS_ROOT.img bs=1 count=0 seek=$SIZEOF_DEV_SD2 ; ls -alsh /tmp/VFS_ROOT.img
     $ mkfs.ext4 -O ^has_journal /tmp/VFS_ROOT.img ; ls -alsh /tmp/VFS_ROOT.img
     $ fsck.ext4 -fv /tmp/VFS_ROOT.img # verify ext4 no journal
@@ -842,7 +843,8 @@ what's been changed.
       there are ways to clean individual packages "make <package>-dirclean",
       "make <package>-reinstall", then "make".
     * If you change the config_eth script and want to test a rebuild then
-      all that is needed is "rm output/build/.root" then "make"
+      "rm output/build/skeleton-undefined/.stamp_target_installed" then "make"
+      to force a re-install of skeleton dir/files and re-create the image.
     * "make clean" will clean all packages requireing rebuild of everything
       on the next "make".
     * "make distclean" will clean all packages, reset the configuration,
@@ -871,7 +873,7 @@ are created for the main instructions. It is provided now for convenience and te
  $ mkdir mali-t62x_r5p0-06rel0_linux_1+x11
  $ tar -xvf mali-t62x_r5p0-06rel0_linux_1+x11.tar.gz -C mali-t62x_r5p0-06rel0_linux_1+x11
 
- $ cd buildroot-2015.05
+ $ cd buildroot-2015.08
  - Copy link and verify the libmali, libGL/ES/EGL libraries
     $ cp -a ../mali-t62x_r5p0-06rel0_linux_1+x11/x11/libmali.so system/skeleton/usr/lib/libmali_x11.so
     $ ln -s libmali_x11.so system/skeleton/usr/lib/libmali.so
@@ -892,7 +894,7 @@ are created for the main instructions. It is provided now for convenience and te
        $ wget $REPO_URL_PATH/usr.bin.ldd -O system/skeleton/usr/bin/ldd
        $ chmod a+rx system/skeleton/usr/bin/ldd
 
- $ rm output/build/.root 
+ $ rm output/build/skeleton-undefined/.stamp_target_installed
  $ make
  - Now re-install the root image to the microSD
    or use fastboot from "- Buildroot root image" above
@@ -902,7 +904,7 @@ are created for the main instructions. It is provided now for convenience and te
    ###wget http://malideveloper.arm.com/downloads/drivers/binary/r5p0-06rel0/mali-t62x_r5p0-06rel0_linux_1+fbdev.tar.gz
    ###mkdir mali-t62x_r5p0-06rel0_linux_1+fbdev
    ###tar -xvf mali-t62x_r5p0-06rel0_linux_1+fbdev.tar.gz -C mali-t62x_r5p0-06rel0_linux_1+fbdev
-   ###cd buildroot-2015.05
+   ###cd buildroot-2015.08
    ###cp -a ../mali-t62x_r5p0-06rel0_linux_1+fbdev/fbdev/libmali.so system/skeleton/usr/lib/libmali_fbdev.so
    ###unlink system/skeleton/usr/lib/libmali.so
    ###ln -s libmali_fbdev.so system/skeleton/usr/lib/libmali.so
