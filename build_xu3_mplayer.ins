@@ -210,7 +210,7 @@ requires extra cabling and utilities, see appended instructions:
 
    __________________________________
  - Build & Install the kernel
-   ###Verify /tmp/ODROID_BOOT is mounted to  $DEV_SD'1'  OR  -o loop /tmp/VFS_BOOT.img
+   ###mount | grep ODROID_BOOT # Verify  $DEV_SD'1'  OR  -o loop /tmp/VFS_BOOT.img
    ###cd ~/xu3_mplayer
    ### . set_tc_env.sh
 
@@ -270,7 +270,7 @@ requires extra cabling and utilities, see appended instructions:
    _______________________________________________
  - Build & Install BuildRoot system
    ###REPO_URL_PATH="https://github.com/glscantlen/Buildroot_XU3_MPlayer_ins/raw/master"
-   ###Verify /tmp/ODROID_ROOT is mounted to  $DEV_SD'2'  OR  -o loop /tmp/VFS_ROOT.img
+   ###mount | grep ODROID_ROOT # Verify  $DEV_SD'2'  OR  -o loop /tmp/VFS_ROOT.img
    ###cd ~/xu3_mplayer
    ### . set_tc_env.sh
 
