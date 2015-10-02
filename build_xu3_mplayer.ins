@@ -61,6 +61,7 @@ requires extra cabling and utilities, see appended instructions:
       export CROSS_COMPILE=$TOOLCHAIN/bin/arm-linux-gnueabihf-
       export ARCH=arm
       CPU_COUNT=$(grep processor /proc/cpuinfo | awk '{count=$NF};END{print count+1}')
+      echo -e env:'\n'ARCH=$ARCH'\n'CPU_COUNT=$CPU_COUNT'\n'TOOLCHAIN=$TOOLCHAIN'\n'CROSS_COMPILE=$CROSS_COMPILE
     $ . set_tc_env.sh
 
     # Boot-loader, Kernel & Buildroot compatible toolchain. Buildroot
@@ -594,7 +595,7 @@ _________________________________
 BuildRoot Menuconfig from scratch
 _________________________________
 ###cd ~/xu3_mplayer/buildroot-2015.08
-### . set_tc_env.sh
+### . ../set_tc_env.sh
 
  $ sudo apt-get install ncurses-dev
  $ ls -l $TOOLCHAIN/bin
@@ -770,6 +771,7 @@ Requires pre-built Linux kernel and BuildRoot image. See above:
 ###sudo apt-get install android-tools-fastboot android-tools-fsutils
 ###sudo apt-get install minicom ; sudo nano -w /etc/minicom/minirc.dfl
 ###REPO_URL_PATH="https://github.com/glscantlen/Buildroot_XU3_MPlayer_ins/raw/master"
+### . ~/xu3_mplayer/set_tc_env.sh
 
  - Start fastboot on the odroid:
     - connect the OdroidXU3 to the development system with a microUSB cable
@@ -844,12 +846,13 @@ ___________________________________________________
 ___________________________________________________
 Requires pre-built Linux kernel and BuildRoot image. See above:
 "Build & Install BuildRoot" and "Build & Install the kernel"
-###REPO_URL_PATH="https://github.com/glscantlen/instructions/raw/master/Buildroot_XU3_MPlayer"
+###REPO_URL_PATH="https://github.com/glscantlen/Buildroot_XU3_MPlayer_ins/raw/master"
 ###cd ~/xu3_mplayer
+### . set_tc_env.sh
 
  - Define partitions' size and location
-    $ SIZE_BRIMG=$(ls -l buildroot-2015.05/output/images/rootfs.tar | awk '{print $5}')
-    $ echo -e $SIZE_BRIMG '\t' buildroot-2015.05/output/images/rootfs.tar
+    $ SIZE_BRIMG=$(ls -l buildroot-2015.08/output/images/rootfs.tar | awk '{print $5}')
+    $ echo -e $SIZE_BRIMG '\t' buildroot-2015.08/output/images/rootfs.tar
 
     $ START_BOOT=$(expr 3072 \* 512)               # =   1572864 > (719*512+tzsw)
     $  SIZE_BOOT=$(expr 257 \* 1024 \* 512)        # = 134742016 > (zImage+dtb+ini)
@@ -893,14 +896,19 @@ Requires pre-built Linux kernel and BuildRoot image. See above:
     $ sudo tune2fs -l /dev/loop0p2 | grep features  # no journal
     $ sudo mount /dev/loop0p2 /mnt
     $ df -h /mnt
-    $ sudo tar -xvf buildroot-2015.05/output/images/rootfs.tar -C /mnt ; sudo sync ; ls -alsh /tmp/VD_ODROID.img
-    $ sudo make ARCH=arm CROSS_COMPILE=../linaro-4.9/bin/arm-linux-gnueabihf- INSTALL_MOD_PATH=/mnt -C linux modules_install
+    $ sudo tar -xvf buildroot-2015.08/output/images/rootfs.tar -C /mnt ; sudo sync ; ls -alsh /tmp/VD_ODROID.img
+    $ sudo -E make INSTALL_MOD_PATH=/mnt -C linux modules_install
     $ sudo umount /mnt ; ls -alsh /tmp/VD_ODROID.img
 
  $ sudo losetup -d /dev/loop0
  $ gzip -k /tmp/VD_ODROID.img ; ls -lh /tmp/VD_ODROID.img*
-###cp /tmp/VD_ODROID.img.gz ~/github/Binaries/instructions/Buildroot_XU3_MPlayer/vdisk.img.gz
 
+###cat buildroot-2015.08/output/target/etc/os-release
+### ? ln -s /media/glscantlen/0a65169c-6c26-46f2-bc99-2616908dc272/home/glscantlen/github ~/github
+### ? THIS_INSTRUCTION_VERSION=$(git -C ~/github/Buildroot_XU3_MPlayer_ins/ rev-parse --verify HEAD)      #commit
+### ? THIS_INSTRUCTION_VERSION=$(git -C ~/github/Buildroot_XU3_MPlayer_ins/ rev-parse --abbrev-ref HEAD)  #branch
+###cp /tmp/VD_ODROID.img.gz ~/github/Binaries/Buildroot_XU3_MPlayer_ins/vdisk-$THIS_INSTRUCTION_VERSION.img.gz
+###ln -fs vdisk-$THIS_INSTRUCTION_VERSION.img.gz ~/github/Binaries/Buildroot_XU3_MPlayer_ins/vdisk.img.gz
 
 
 
@@ -919,16 +927,16 @@ ___________________________________________________
     $ sudo umount $DEV_SD? # un-mount all partitions
 
  - Download and flash the disk image onto the microSD
-    $ IMG_URL_PATH="https://github.com/glscantlen/Binaries/raw/master/instructions/Buildroot_XU3_MPlayer"
-    $ wget $IMG_URL_PATH/vdisk.img.gz -O /tmp/VD_ODROID.img.gz
+   ###IMG_URL_PATH="https://github.com/glscantlen/Binaries/raw/master/Buildroot_XU3_MPlayer_ins"
+   ###wget $IMG_URL_PATH/vdisk.img.gz -O /tmp/VD_ODROID.img.gz
     $ zcat -v /tmp/VD_ODROID.img.gz | sudo dd of=$DEV_SD  # may take several min.
     $ sudo sync
     $ sudo fsck.vfat -fvp  $DEV_SD'1'   # verify fat
 
  - Resize the Root partition to max.
     $ sudo parted $DEV_SD "resizepart 2 -1" unit B print
-    $ sudo e2fsck -fvp $DEV_SD'2'
-    $ sudo resize2fs $DEV_SD'2'
+    $ sudo e2fsck -fvp $DEV_SD'2'  #FIXME: e2fsck works on ext4 ?
+    $ sudo resize2fs $DEV_SD'2'    #FIXME: resize2fs works on ext4 ?
 
 
 
